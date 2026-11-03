@@ -1,30 +1,9 @@
-# зависимости
-node_modules/
-
-# сборка
-dist/
-build/
-coverage/
-
-# окружение
-.env
-.env.local
-!.env.example
-
-# база данных SQLite
-*.db
-*.db-journal
-
-# загруженные пользователями файлы
-server/uploads/*
-!server/uploads/.gitkeep
-
-# логи и системное
-*.log
-npm-debug.log*
+# системное
 .DS_Store
 Thumbs.db
+desktop.ini
+*.log
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea/
-server/tests/.uploads/
+node_modules/

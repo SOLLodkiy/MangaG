@@ -1,6 +1,2 @@
+manga
 node_modules
-dist
-coverage
-server/uploads
-server/prisma/migrations
-package-lock.json

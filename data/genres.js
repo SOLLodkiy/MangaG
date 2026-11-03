@@ -1,0 +1,21 @@
+// Список жанров. slug используется в data/manga.js (поле genres)
+window.GENRES = [
+  { slug: 'action', name: 'Боевик' },
+  { slug: 'adventure', name: 'Приключения' },
+  { slug: 'comedy', name: 'Комедия' },
+  { slug: 'drama', name: 'Драма' },
+  { slug: 'fantasy', name: 'Фэнтези' },
+  { slug: 'horror', name: 'Ужасы' },
+  { slug: 'mystery', name: 'Детектив' },
+  { slug: 'romance', name: 'Романтика' },
+  { slug: 'sci-fi', name: 'Научная фантастика' },
+  { slug: 'slice-of-life', name: 'Повседневность' },
+  { slug: 'sports', name: 'Спорт' },
+  { slug: 'supernatural', name: 'Сверхъестественное' },
+  { slug: 'psychological', name: 'Психология' },
+  { slug: 'isekai', name: 'Исекай' },
+  { slug: 'school', name: 'Школа' },
+  { slug: 'mecha', name: 'Меха' },
+  { slug: 'martial-arts', name: 'Боевые искусства' },
+  { slug: 'historical', name: 'История' },
+];

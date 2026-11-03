@@ -1,0 +1,18 @@
+Pepper&Carrot (Перчинка и Морквик) — веб-комикс Давида Ревуа (David Revoy).
+https://www.peppercarrot.com
+
+Лицензия: Creative Commons Attribution 4.0 (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/deed.ru
+
+Эпизоды 1–4, русский перевод:
+  Эпизод 1 «Зелье полёта»          — Andrew "Akari" Alexeyew
+  Эпизоды 2–4                      — Denis "uncle Night" Prisukhin
+
+Источник: репозитории автора на GitHub
+  https://github.com/Deevad/peppercarrot_ep01_translation (… ep02, ep03, ep04)
+Шрифт текста реплик: Neucha (SIL Open Font License), из репозитория
+  https://github.com/Deevad/peppercarrot_fonts
+
+Изменения, сделанные для проекта MangaG: текстовый слой (SVG, Inkscape) наложен на
+рисунок и сохранён в JPG шириной 1000 px; страницы с титрами не включены;
+обложка — фрагмент иллюстрации к эпизоду 1.
