@@ -40,6 +40,14 @@ npm run dev
 API будет доступен на <http://localhost:4000/api>
 (проверка: <http://localhost:4000/api/health>).
 
+## Демо-аккаунты
+
+После `db:seed` (пароль у всех `password123`):
+
+- `admin@mangag.local` — администратор
+- `author@mangag.local`, `author2@mangag.local` — авторы
+- `reader@mangag.local` — читатель
+
 ## Команды
 
 | Команда                        | Что делает                        |

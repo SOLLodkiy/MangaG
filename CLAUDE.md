@@ -118,7 +118,8 @@ User        id, email, username, passwordHash, avatarUrl, bio,
             role (READER | AUTHOR | ADMIN), balance, createdAt
 Title       id, slug, name, altName, description, coverUrl,
             type (MANGA | MANHWA | MANHUA | COMIC), status (ONGOING | COMPLETED | FROZEN),
-            ageRating, year, authorId → User, views, createdAt, updatedAt
+            ageRating, year, authorId → User, views, createdAt, updatedAt,
+            searchText, ratingAvg, ratingCount, lastChapterAt   (денормализованные поля)
 Genre       id, name, slug                         (многие-ко-многим с Title)
 Chapter     id, titleId → Title, volume, number (Float: 10.5), name,
             isPublished, publishedAt, views, createdAt
@@ -160,10 +161,13 @@ ER-диаграмму положить в `docs/er-diagram.png`.
 
 **Тайтлы**
 
-- `GET /titles?search=&genre=&type=&status=&sort=popular|new|rating&page=` — каталог
-- `GET /titles/:slug` — карточка тайтла (+жанры, рейтинг, автор)
+- `GET /genres` — жанры с количеством тайтлов
+- `GET /titles?search=&genres=action,drama&types=MANGA,COMIC&statuses=ONGOING&author=&sort=popular|rating|new|updated|name&page=&limit=` — каталог,
+  ответ `{ items, total, page, pages }`; несколько жанров — тайтл должен содержать все
+- `GET /titles/:slug` — карточка тайтла (+жанры, рейтинг, автор, `canEdit`,
+  `my: { bookmark, rating, progress }` для авторизованного)
 - `POST /titles` · `PATCH /titles/:id` · `DELETE /titles/:id` — автор/админ
-- `POST /titles/:id/cover` — загрузка обложки
+- `POST /titles/:id/cover` (multipart, поле `cover`) — обложка 400×600 webp
 
 **Главы и страницы**
 
@@ -268,10 +272,11 @@ ER-диаграмму положить в `docs/er-diagram.png`.
 
 ### Этап 3. Тайтлы, жанры, каталог
 
-- [ ] CRUD тайтлов (только владелец/админ), генерация slug
-- [ ] Загрузка обложки через multer, сжатие sharp → webp
-- [ ] Каталог: поиск, фильтры, сортировка, пагинация
-- [ ] Seed: жанры, 3 пользователя (reader/author/admin), 5–6 демо-тайтлов с главами
+- [x] CRUD тайтлов (только владелец/админ), генерация slug (транслитерация)
+- [x] Загрузка обложки через multer, сжатие sharp → webp
+- [x] Каталог: поиск, фильтры, сортировка, пагинация, список жанров
+- [x] Seed: жанры, 6 пользователей, 6 демо-тайтлов с главами, оценками, комментариями
+      (обложки и страницы генерируются из SVG прямо в seed)
 
 ### Этап 4. Система глав и страниц
 
@@ -387,8 +392,17 @@ npm run dev                          # API на http://localhost:4000/api
 Тесты сервера используют отдельную базу `server/prisma/test.db`
 (создаётся автоматически в `tests/globalSetup.js`).
 
-Демо-аккаунты (после seed): `reader@mangag.local`, `author@mangag.local`,
-`admin@mangag.local`, пароль `password123`.
+Демо-аккаунты (после seed), пароль у всех `password123`:
+
+| Email                                     | Роль   | Имя                    |
+| ----------------------------------------- | ------ | ---------------------- |
+| `admin@mangag.local`                      | ADMIN  | admin                  |
+| `author@mangag.local`                     | AUTHOR | sakura_ink (3 тайтла)  |
+| `author2@mangag.local`                    | AUTHOR | kuro_pen (3 тайтла)    |
+| `reader@mangag.local`                     | READER | reader (есть закладки) |
+| `vasya@mangag.local`, `lena@mangag.local` | READER |                        |
+
+⚠️ `db:seed` полностью очищает базу и папки `uploads/{avatars,covers,pages}`.
 
 ---
 
@@ -420,3 +434,8 @@ npm run dev                          # API на http://localhost:4000/api
 - Наружу пользователь отдаётся только через `privateUser()` / `publicUser()`
   (`utils/serializers.js`), никогда целиком из БД.
 - Zod-схемы лежат в `src/validators/`.
+- Поля тайтла `searchText`, `ratingAvg`, `ratingCount`, `lastChapterAt` — денормализованные.
+  После изменения оценок вызывать `recalcRating(titleId)`, после публикации/удаления
+  глав — `recalcLastChapterAt(titleId)` (`services/titleService.js`). `searchText` нужен,
+  потому что в SQLite `LIKE` не умеет без учёта регистра для кириллицы.
+- Страницы главы хранятся в `uploads/pages/<chapterId>/`.

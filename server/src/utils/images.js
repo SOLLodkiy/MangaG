@@ -47,3 +47,10 @@ export async function deleteUpload(url) {
   if (!filePath.startsWith(config.uploadsDir)) return;
   await fs.rm(filePath, { force: true }).catch(() => {});
 }
+
+// Удаляет целую папку внутри uploads (например, страницы главы: pages/15)
+export async function deleteUploadDir(folder) {
+  const dirPath = path.join(config.uploadsDir, folder);
+  if (!dirPath.startsWith(config.uploadsDir + path.sep)) return;
+  await fs.rm(dirPath, { recursive: true, force: true }).catch(() => {});
+}

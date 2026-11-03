@@ -3,6 +3,8 @@ import { Router } from 'express';
 import prisma from '../prisma.js';
 import authRouter from './auth.js';
 import usersRouter from './users.js';
+import titlesRouter from './titles.js';
+import { listGenres } from '../controllers/titlesController.js';
 
 const router = Router();
 
@@ -14,5 +16,7 @@ router.get('/health', async (_req, res) => {
 
 router.use('/auth', authRouter);
 router.use('/users', usersRouter);
+router.use('/titles', titlesRouter);
+router.get('/genres', listGenres);
 
 export default router;
