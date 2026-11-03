@@ -11,7 +11,9 @@ const config = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   maxUploadMb: Number(process.env.MAX_UPLOAD_MB) || 10,
-  uploadsDir: path.resolve(__dirname, '..', 'uploads'),
+  uploadsDir: process.env.UPLOADS_DIR
+    ? path.resolve(process.env.UPLOADS_DIR)
+    : path.resolve(__dirname, '..', 'uploads'),
 };
 
 if (config.env === 'production' && config.jwtSecret === 'dev-secret') {

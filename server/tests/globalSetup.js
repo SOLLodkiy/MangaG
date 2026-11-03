@@ -9,6 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export default function globalSetup() {
   const dbFile = path.join(root, 'prisma', 'test.db');
   fs.rmSync(dbFile, { force: true });
+  fs.rmSync(path.join(root, 'tests', '.uploads'), { recursive: true, force: true });
   execSync('npx prisma migrate deploy', {
     cwd: root,
     env: { ...process.env, DATABASE_URL: 'file:./test.db' },

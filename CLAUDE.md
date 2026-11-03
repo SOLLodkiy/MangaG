@@ -51,7 +51,7 @@
 | Состояние       | **Zustand**                                                 | авторизация, настройки читалки              |
 | Backend         | **Node.js 20+ + Express 5**                                 | REST API                                    |
 | ORM / БД        | **Prisma 6 + SQLite** (dev) / PostgreSQL (опц. prod)        | простая БД-файл, миграции                   |
-| Авторизация     | **JWT** (access token) + **bcrypt**                         | регистрация/вход, роли                      |
+| Авторизация     | **JWT** (access token) + **bcryptjs**                       | регистрация/вход, роли                      |
 | Загрузка файлов | **multer** + **sharp**                                      | приём страниц, сжатие, превью обложек       |
 | Валидация       | **zod 4**                                                   | проверка входных данных на бэке             |
 | Тесты           | **Vitest** (front), **Jest + Supertest** (API)              | базовое покрытие                            |
@@ -146,13 +146,17 @@ ER-диаграмму положить в `docs/er-diagram.png`.
 
 **Auth**
 
-- `POST /auth/register` · `POST /auth/login` · `GET /auth/me`
+- `POST /auth/register` `{ email, username, password }` → `{ token, user }`
+- `POST /auth/login` `{ login, password }` (login — email или имя) → `{ token, user }`
+- `GET /auth/me` — текущий пользователь (заголовок `Authorization: Bearer <token>`)
 
 **Пользователи**
 
 - `GET /users/:username` — публичный профиль (тайтлы автора, статистика)
-- `PATCH /users/me` — редактирование профиля, аватар
-- `POST /users/me/become-author` — стать автором
+- `PATCH /users/me` — имя пользователя, «о себе»
+- `PATCH /users/me/password` — смена пароля
+- `POST /users/me/avatar` (multipart, поле `avatar`) · `DELETE /users/me/avatar`
+- `POST /users/me/become-author` — стать автором (возвращает новый токен)
 
 **Тайтлы**
 
@@ -258,9 +262,9 @@ ER-диаграмму положить в `docs/er-diagram.png`.
 
 ### Этап 2. Авторизация и пользователи
 
-- [ ] Регистрация / вход (bcrypt + JWT), `GET /auth/me`
-- [ ] Middleware `auth` (обязательная/опциональная) и `requireRole`
-- [ ] Профиль, загрузка аватара, «Стать автором»
+- [x] Регистрация / вход (bcryptjs + JWT), `GET /auth/me`, rate-limit на вход
+- [x] Middleware `auth` (обязательная/опциональная) и `requireRole`
+- [x] Профиль, смена пароля, загрузка аватара (sharp → webp), «Стать автором»
 
 ### Этап 3. Тайтлы, жанры, каталог
 
@@ -407,3 +411,12 @@ npm run dev                          # API на http://localhost:4000/api
   `try/catch`, просто `throw new HttpError(404, '...')` или `HttpError.notFound()`.
 - Формат ошибки API: `{ "error": "текст", "details"?: [{ field, message }] }`.
 - Prisma зафиксирована на версии 6 (в 7 другой способ подключения к БД).
+- Пароли — `bcryptjs` (чистый JS, не требует компиляции на Windows).
+- Авторизация: `requireAuth` / `optionalAuth` кладут пользователя из БД в `req.user`;
+  `requireRole('AUTHOR', 'ADMIN')`; для проверки владельца — `isOwnerOrAdmin(user, ownerId)`.
+- Картинки: `uploadSingle('field')` / `uploadMany('field')` (multer в память) →
+  `saveImage(buffer, folder, { width })` (sharp → webp в `uploads/<folder>`);
+  старый файл удалять через `deleteUpload(url)`.
+- Наружу пользователь отдаётся только через `privateUser()` / `publicUser()`
+  (`utils/serializers.js`), никогда целиком из БД.
+- Zod-схемы лежат в `src/validators/`.
